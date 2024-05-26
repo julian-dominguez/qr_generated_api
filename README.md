@@ -9,3 +9,4 @@ Proyecto creado como práctica para aprender el uso de autenticación mediante J
 * composer require --dev symfony/maker-bundle    
 * composer require symfony/orm-pack
 * composer require lexik/jwt-authentication-bundle
+* composer require --dev symfony/phpunit-bridge
