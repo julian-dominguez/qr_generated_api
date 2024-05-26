@@ -12,3 +12,7 @@
 ###> phpstorm config ###
 .idea/
 ###< phpstorm config ###
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
