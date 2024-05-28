@@ -14,24 +14,31 @@ composer require lexik/jwt-authentication-bundle
 composer require --dev symfony/phpunit-bridge
 ```
 
-## Configurar el paquete JWT
+## Configuración del Paquete JWT
 
-Primero crearemos las claves pública y privada. Ejecute esto para generar claves SSL:
+Para iniciar el proceso de configuración del paquete JWT en Symfony, es necesario crear las claves pública y privada.
+Utilice el siguiente comando para generar las claves SSL:
 
 ```
 php bin/console lexik:jwt:generate-keypair
 ```
 
-Si encuentra un error al ejecutar el comando anterior, puede seguir el comando a continuación, el comando le pedirá la
-paráfrasis, la paráfrasis debe coincidir con el valor en .env [JWT_PASSPHRASE].
+En caso de que ocurra un error al ejecutar el comando anterior, puede utilizar los comandos alternativos que se detallan
+a continuación. Estos comandos le solicitarán una contraseña, la cual debe coincidir con el valor de la variable
+JWT_PASSPHRASE definida en el archivo **.env**.
 
+1. Crear el directorio para almacenar las claves:
 
 ```
 mkdir config/jwt
 ```
+2. Generar la clave privada con cifrado AES-256:
+
 ```
 openssl genrsa -out config/jwt/private.pem -aes256 4096
 ```
+3. Extraer la clave pública a partir de la clave privada:
+
 ```
 openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
 ```
