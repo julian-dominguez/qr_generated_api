@@ -11,7 +11,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -36,7 +35,7 @@ class UserRegistrationController extends AbstractController
         if (!isset($data['email'], $data['password'])) {
             return $this->json([
                 'message' => 'email and password are required',
-            ], Response::HTTP_BAD_REQUEST);
+            ], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         // Validamos que el email sea valido
@@ -44,7 +43,7 @@ class UserRegistrationController extends AbstractController
         if (!$email) {
             return $this->json([
                 'message' => 'invalid email address',
-            ], Response::HTTP_BAD_REQUEST);
+            ], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         // Validamos que la contraseña tenga al menos 6 caracteres de longitud
@@ -52,11 +51,11 @@ class UserRegistrationController extends AbstractController
         if (strlen($password) < 6) {
             return $this->json([
                 'message' => 'password must be at least 6 characters long',
-            ], Response::HTTP_BAD_REQUEST);
+            ], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         $user = new User();
-        $user->setUsername(strstr($email, '@', true));
+        $user->setUsername($email);
         $user->setEmail($email);
         $user->setPassword(
         // Encriptamos la contraseña del usuario mediante el paquete PasswordHasher
@@ -69,7 +68,7 @@ class UserRegistrationController extends AbstractController
             return $this->json([
                 'message' => 'Validation user failed',
                 'errors' => (string)$errors,
-            ], Response::HTTP_BAD_REQUEST);
+            ], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         // Persistimos la entidad User y capturamos la excepción en caso de que se produzca
@@ -77,27 +76,29 @@ class UserRegistrationController extends AbstractController
             $em->persist($user);
             $em->flush();
         } catch (UniqueConstraintViolationException $e) {
-            $this->logger->error('User registration failed: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('User registration failed: '.$e->getMessage(), ['exception' => $e]);
+
             return $this->json([
                 'message' => 'This email is already registered. Please use a different email address.',
-            ], Response::HTTP_CONFLICT);
+            ], JsonResponse::HTTP_CONFLICT);
 
         } catch (ORMException $e) {
-            $this->logger->error('User registration failed: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('User registration failed: '.$e->getMessage(), ['exception' => $e]);
+
             return $this->json([
                 'message' => 'An error occurred while saving the user. Please try again later.',
             ]);
         } catch (Exception $e) {
-            $this->logger->error('An unexpected error occurred: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('An unexpected error occurred: '.$e->getMessage(), ['exception' => $e]);
+
             return $this->json([
                 'message' => 'An unexpected error occurred. Please try again later.',
                 'exception' => $e->getMessage(),
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         // Retornamos la respuesta con el mensaje de éxito
-        return $this->json([
-            'message' => "the user {$user->getUsername()} as created successfully",
-        ], Response::HTTP_CREATED);
+        return new JsonResponse(['message' => 'User created successfully'], JsonResponse::HTTP_CREATED);
+
     }
 }
