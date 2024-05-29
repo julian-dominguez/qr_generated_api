@@ -5,15 +5,21 @@ Proyecto creado como práctica para aprender el uso de autenticación mediante J
 
 ## Paquetes utilizados
 
+### Generales
 ```
 composer require jms/serializer-bundle
 composer require friendsofsymfony/rest-bundle
-composer require --dev symfony/maker-bundle
 composer require symfony/orm-pack
 composer require lexik/jwt-authentication-bundle
-composer require --dev symfony/phpunit-bridge
 composer require symfony/validator
 composer require symfony/uid
+
+```
+
+### Develop
+```
+composer require --dev symfony/maker-bundle
+composer require --dev symfony/phpunit-bridge
 
 ```
 
