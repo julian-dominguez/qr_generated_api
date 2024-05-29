@@ -3,8 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\Exception\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,12 +20,13 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class UserRegistrationController extends AbstractController
 {
     public function __construct(
-        protected ValidatorInterface $validator,
-        protected UserPasswordHasherInterface $passwordHasher
+        private readonly ValidatorInterface $validator,
+        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
-    #[Route('/v1/user/registration', name: 'v1_user_registration', methods: ['POST'])]
+    #[Route('/registration', name: 'registration', methods: ['POST'])]
     public function index(ManagerRegistry $doctrine, Request $request): JsonResponse
     {
         $em = $doctrine->getManager();
@@ -72,9 +76,21 @@ class UserRegistrationController extends AbstractController
         try {
             $em->persist($user);
             $em->flush();
-        } catch (Exception $e) {
+        } catch (UniqueConstraintViolationException $e) {
+            $this->logger->error('User registration failed: ' . $e->getMessage(), ['exception' => $e]);
             return $this->json([
-                'message' => 'An error occurred while creating the user',
+                'message' => 'This email is already registered. Please use a different email address.',
+            ], Response::HTTP_CONFLICT);
+
+        } catch (ORMException $e) {
+            $this->logger->error('User registration failed: ' . $e->getMessage(), ['exception' => $e]);
+            return $this->json([
+                'message' => 'An error occurred while saving the user. Please try again later.',
+            ]);
+        } catch (Exception $e) {
+            $this->logger->error('An unexpected error occurred: ' . $e->getMessage(), ['exception' => $e]);
+            return $this->json([
+                'message' => 'An unexpected error occurred. Please try again later.',
                 'exception' => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
