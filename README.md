@@ -12,6 +12,7 @@ composer require --dev symfony/maker-bundle
 composer require symfony/orm-pack
 composer require lexik/jwt-authentication-bundle
 composer require --dev symfony/phpunit-bridge
+composer require symfony/validator
 ```
 
 ## Configuración del Paquete JWT
