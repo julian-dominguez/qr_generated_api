@@ -98,7 +98,10 @@ class UserRegistrationController extends AbstractController
         }
 
         // Retornamos la respuesta con el mensaje de éxito
-        return new JsonResponse(['message' => 'User created successfully'], JsonResponse::HTTP_CREATED);
+        return new JsonResponse(
+            ['message' => "the user valid@example.com as created successfully"],
+            JsonResponse::HTTP_CREATED
+        );
 
     }
 }
