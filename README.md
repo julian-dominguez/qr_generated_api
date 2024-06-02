@@ -13,6 +13,7 @@ composer require symfony/orm-pack
 composer require lexik/jwt-authentication-bundle
 composer require symfony/validator
 composer require symfony/uid
+composer require endroid/qr-code
 
 ```
 
