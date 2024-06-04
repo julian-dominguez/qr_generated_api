@@ -1,18 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Controller;
 
 use App\Controller\UserRegistrationController;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use PDOException;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -25,7 +26,6 @@ class UserRegistrationControllerTest extends TestCase
     private EntityManagerInterface $entityManagerMock;
     private ValidatorInterface $validatorMock;
     private UserPasswordHasherInterface $passwordHasherMock;
-    private LoggerInterface $loggerMock;
     private ContainerInterface $containerMock;
 
     protected function setUp(): void
@@ -35,7 +35,6 @@ class UserRegistrationControllerTest extends TestCase
         $this->entityManagerMock = $this->createMock(EntityManagerInterface::class);
         $this->validatorMock = $this->createMock(ValidatorInterface::class);
         $this->passwordHasherMock = $this->createMock(UserPasswordHasherInterface::class);
-        $this->loggerMock = $this->createMock(LoggerInterface::class);
         $this->containerMock = $this->createMock(ContainerInterface::class);
     }
 
@@ -53,16 +52,15 @@ class UserRegistrationControllerTest extends TestCase
     {
         $request = new Request([], [], [], [], [], [], '[]');
         $controller = new userRegistrationController(
-            $this->validatorMock, $this->passwordHasherMock, $this->loggerMock
+            $this->validatorMock, $this->passwordHasherMock
         );
         $controller->setContainer($this->containerMock);
-        $response = $controller->index($this->managerRegistryMock, $request);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(JsonResponse::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertEquals(['message' => 'email and password are required'],
-            json_decode($response->getContent(), true)
-        );
+        $this->expectException(HttpException::class);
+        $this->expectExceptionMessage('email and password are required');
+        $this->expectExceptionCode(JsonResponse::HTTP_BAD_REQUEST);
+
+        $controller->index($this->managerRegistryMock, $request);
     }
 
 
@@ -79,14 +77,16 @@ class UserRegistrationControllerTest extends TestCase
     {
         $request = new Request([], [], [], [], [], [], json_encode(['email' => 'invalid', 'password' => 'valid']));
         $controller = new userRegistrationController(
-            $this->validatorMock, $this->passwordHasherMock, $this->loggerMock
+            $this->validatorMock, $this->passwordHasherMock
         );
         $controller->setContainer($this->containerMock);
-        $response = $controller->index($this->managerRegistryMock, $request);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(JsonResponse::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertEquals(['message' => 'invalid email address'], json_decode($response->getContent(), true));
+        $this->expectException(HttpException::class);
+        $this->expectExceptionMessage('invalid email address');
+        $this->expectExceptionCode(JsonResponse::HTTP_BAD_REQUEST);
+
+        $controller->index($this->managerRegistryMock, $request);
+
     }
 
     /**
@@ -95,7 +95,7 @@ class UserRegistrationControllerTest extends TestCase
      * Este caso de prueba verifica que el método index del UserRegistrationController
      * devuelve una respuesta JSON con un código de estado 400 y un mensaje que indica que
      * la contraseña debe tener al menos 6 caracteres.
- *
+     *
      * @return void
      */
     public function testIndexWithShortPassword(): void
@@ -105,17 +105,17 @@ class UserRegistrationControllerTest extends TestCase
         );
 
         $controller = new userRegistrationController(
-            $this->validatorMock, $this->passwordHasherMock, $this->loggerMock
+            $this->validatorMock, $this->passwordHasherMock
         );
         $controller->setContainer($this->containerMock);
-        $response = $controller->index($this->managerRegistryMock, $request);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(JsonResponse::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertEquals(['message' => 'password must be at least 6 characters long'],
-            json_decode($response->getContent(), true));
+        $this->expectException(HttpException::class);
+        $this->expectExceptionMessage('password must be at least 6 characters long');
+        $this->expectExceptionCode(JsonResponse::HTTP_BAD_REQUEST);
+
+        $controller->index($this->managerRegistryMock, $request);
     }
-
+//
     /**
      * Prueba el método index con datos válidos.
      *
@@ -135,7 +135,7 @@ class UserRegistrationControllerTest extends TestCase
         $this->validatorMock->expects($this->once())->method('validate')->willReturn($violations);
 
         $controller = new userRegistrationController(
-            $this->validatorMock, $this->passwordHasherMock, $this->loggerMock
+            $this->validatorMock, $this->passwordHasherMock
         );
         $controller->setContainer($this->containerMock);
         $response = $controller->index($this->managerRegistryMock, $request);
@@ -163,8 +163,7 @@ class UserRegistrationControllerTest extends TestCase
         ]));
 
         $violationList = new ConstraintViolationList();
-        $pdoException = new PDOException("Unique constraint violation");
-        $driverException = new DriverPDOException($pdoException->getMessage());
+        $driverException = new DriverPDOException("Unique constraint violation");
 
         $this->managerRegistryMock->method('getManager')->willReturn($this->entityManagerMock);
         $this->validatorMock->method('validate')->willReturn($violationList);
@@ -181,15 +180,15 @@ class UserRegistrationControllerTest extends TestCase
         $controller = new UserRegistrationController(
             $this->validatorMock,
             $this->passwordHasherMock,
-            $this->loggerMock
         );
 
         $controller->setContainer($this->createMock(ContainerInterface::class));
-        $response = $controller->index($this->managerRegistryMock, $request);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(JsonResponse::HTTP_CONFLICT, $response->getStatusCode());
-        $this->assertStringContainsString('This email is already registered', $response->getContent());
+        $this->expectException(HttpException::class);
+        $this->expectExceptionMessage('This email is already registered. Please use a different email address.');
+        $this->expectExceptionCode(JsonResponse::HTTP_CONFLICT);
+
+        $controller->index($this->managerRegistryMock, $request);
     }
 
 }
