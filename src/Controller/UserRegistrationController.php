@@ -37,6 +37,7 @@ class UserRegistrationController extends AbstractController
      * @throws HttpException Si faltan los datos requeridos o no son válidos.
      */
     #[Route('/registration', name: 'registration', methods: ['POST'])]
+    #[OA\Tag("Users")]
     #[OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
