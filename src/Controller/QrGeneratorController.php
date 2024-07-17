@@ -21,6 +21,13 @@ class QrGeneratorController extends AbstractController
     {
     }
 
+    /**
+     * Generar un código QR basado en los datos proporcionados.
+     *
+     * @param Request $request El objeto de solicitud que contiene los datos del código QR.
+     * @return JsonResponse|QrGenerateResponse La respuesta JSON o la respuesta de generación de código QR.
+     * @throws HttpException Cuando no se proporcionan datos en la solicitud.
+     * */
     #[Route('/qr/generator', name: 'v1_qr_generator', methods: ['POST'])]
     #[OA\Tag("QR Generator")]
     #[OA\RequestBody(
@@ -32,14 +39,12 @@ class QrGeneratorController extends AbstractController
                     description: 'Información que se incluye en el QR. Puede ser una cadena de texto o un link.',
                     type: 'string',
                     example: 'https://example.com'
-
                 ),
                 new OA\Property(
                     property: 'label',
                     description: 'Etiqueta del QR. Por defecto es "QR Code".',
                     type: 'string',
                     example: 'QR Code'
-
                 ),
                 new OA\Property(
                     property: 'getDataUri',
