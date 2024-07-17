@@ -9,6 +9,7 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,8 +17,10 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use OpenApi\Attributes as OA;
 
-#[Route('/api', name: 'api_')]
+
+#[Route('/api/v1', name: 'api_')]
 class UserRegistrationController extends AbstractController
 {
     public function __construct(
@@ -35,6 +38,84 @@ class UserRegistrationController extends AbstractController
      * @throws HttpException Si faltan los datos requeridos o no son válidos.
      */
     #[Route('/registration', name: 'registration', methods: ['POST'])]
+    #[OA\Tag("Users")]
+    #[Security([])]
+    #[OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'email',
+                    type: 'string',
+                    format: 'email',
+                    example: 'valid@example.com'
+
+                ),
+                new OA\Property(
+                    property: 'password',
+                    type: 'string',
+                    format: 'password',
+                    example: '123456'
+                ),
+            ],
+            example: [
+                'email' => 'valid@example.com',
+                'password' => '123456',
+            ]
+        )
+    )]
+    #[OA\Response(
+        response: 201,
+        description: 'Successful response',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'message',
+                    type: 'string',
+                    example: 'the user valid@example.com as created successfully'
+                ),
+            ]
+        )
+    )]
+    #[OA\Response(
+        response: 409,
+        description: 'Conflict response',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'error',
+                    type: 'string',
+                    example: 'This email is already registered. Please use a different email address.'
+                ),
+            ]
+        )
+    )]
+    #[OA\Response(
+        response: 400,
+        description: 'Bad request response',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'error',
+                    type: 'string',
+                    example: '{> The message will be descriptive of the error presented. <}'
+                )
+            ]
+        )
+    )]
+    #[OA\Response(
+        response: 500,
+        description: 'Internal server error',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'error',
+                    type: 'string',
+                    example: '{> The message will be descriptive of the error presented. <}'
+                )
+            ]
+        )
+    )]
     public function index(ManagerRegistry $doctrine, Request $request): JsonResponse
     {
         $em = $doctrine->getManager();

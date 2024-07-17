@@ -1,0 +1,77 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Qr Code Generator API
+            description: Documentación de API que permite generar códigos QR con symfony 7 menate servicios rest y JWT.
+            version: 1.0.0
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        security:
+            - Bearer: [ ]
+        paths:
+            /api/login_check:
+                post:
+                    tags:
+                        - Users
+                    summary: Inicio de sesión y generación de token.
+                    requestBody:
+                        content:
+                            application/json:
+                                schema:
+                                    properties:
+                                        username:
+                                            type: string
+                                            example: usuario@email.com
+                                        password:
+                                            type: string
+                                            example: PSD12345
+                                    type: object
+                    responses:
+                        '200':
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            token:
+                                                type: string
+                                                example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvYXBpLmNvZGVzLmNvbSIsImlhdCI6MTYyNjg3NjUyNSwibmJmIjoxNjI2ODc2NTI1LCJleHAiOjE2MjY4NzY1MjV9.8x0rNw9s9Ct0U1uBfR0k1KfGn6Lq2Zk9
+
+                        '401':
+                            description: Invalid credentials
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            code:
+                                                type: integer
+                                                example: 401
+                                            message:
+                                                type: string
+                                                example: Invalid credentials
+                        '400':
+                            description: Invalid JSON.
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            code:
+                                                type: integer
+                                                example: 400
+                                            message:
+                                                type: string
+                                                example: Invalid JSON
+                    security: [ ]
+
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
+#        host_patterns: # document only routes with a host of the form api.*
+#            - ^api\.

@@ -14,6 +14,9 @@ composer require lexik/jwt-authentication-bundle
 composer require symfony/validator
 composer require symfony/uid
 composer require endroid/qr-code
+composer require nelmio/api-doc-bundle
+composer require symfony/asset
+composer require symfony/twig-bundle
 
 ```
 
