@@ -9,6 +9,7 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,6 +39,7 @@ class UserRegistrationController extends AbstractController
      */
     #[Route('/registration', name: 'registration', methods: ['POST'])]
     #[OA\Tag("Users")]
+    #[Security([])]
     #[OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
