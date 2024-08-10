@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es" class="h-100">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="API que permite generar códigos QR a partir de datos">
+    <meta name="author" content="Julian Dominguez">
+    <link rel="icon" href="{{ asset('img/favicon.ico') }}">
+    <title>Generador QR API</title>
+    <link href="{{ asset('dist/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('dist/css/style_index.css') }}" rel="stylesheet">
+</head>
+<body class="d-flex h-100 text-center text-white bg-dark">
+
+<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+    <header class="mb-auto">
+        <div>
+            <h3 class="float-md-start mb-0"> Generador QR</h3>
+            <nav class="nav nav-masthead justify-content-center float-md-end">
+                <a class="nav-link active" aria-current="page" href="/">Inicio</a>
+                <a class="nav-link" href="{{ path('app.swagger_ui') }}">Documentación</a>
+                <a class="nav-link" href="{{ path('app.swagger') }}">Documentación (Json)</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="px-3">
+        <img src="{{ asset('img/logo-qr.webp') }}" class="rounded-circle img-fluid" alt="" width="30%" >
+
+        <h1>Generador QR API</h1>
+        <p class="lead">Cover is a one-page template for building simple and beautiful home pages. Download, edit the
+            text, and add your own fullscreen background photo to make it your own.</p>
+        <p class="lead">
+            <a href="https://github.com/julian-dominguez/qr-generator-api" target="_blank"
+               class="btn btn-lg btn-secondary fw-bold border-white bg-white">Saber más</a>
+        </p>
+    </main>
+
+    <footer class="mt-auto text-white-50">
+        <p>Creado por <a href="https://github.com/julian-dominguez" class="text-white" target="_blank">Julian
+                Dominguez</a>
+            Utilizando <a href="https://getbootstrap.com/" class="text-white">Bootstrap</a> y <a
+                    href="https://twitter.com/mdo" class="text-white">@mdo</a>.</p>
+    </footer>
+</div>
+
+
+</body>
+</html>
